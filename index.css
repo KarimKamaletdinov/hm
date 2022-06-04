@@ -3,3 +3,10 @@ body{
     padding: 0;
     border-width: 0;
 }
+
+#event-year {
+    font: italic 35px "Comic Sans MS";
+}
+#event-name {
+    font: italic 25px Consolas;
+}

@@ -1,2 +1,2 @@
 # History maps
-The front-end for HistoryMaps project
+The front-end with cashed data for HistoryMaps project

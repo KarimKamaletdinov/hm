@@ -4,9 +4,8 @@ import { OrbitControls } from './three/OrbitControls.js';
 import { ThreeMFLoader } from './three/3MFLoader.js';
 
 let camera, scene, renderer, model, url;
-let urlChanged = false;
 
-export function init(modelUrl) {
+export function init(modelUrl, onLoad) {
     url = modelUrl;
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x000000 );
@@ -33,6 +32,7 @@ export function init(modelUrl) {
 
         scene.add( object );
         model = object;
+        onLoad();
     } );
 
     //
@@ -100,7 +100,7 @@ function render() {
     renderer.render( scene, camera );
 }
 
-export function setUrl(modelUrl){
+export function setUrl(modelUrl, onLoad){
     const manager = new THREE.LoadingManager();
 
     const loader = new ThreeMFLoader( manager );
@@ -114,6 +114,7 @@ export function setUrl(modelUrl){
         } );
 
         scene.children[2] = object;
+        onLoad();
         render();
     } );
 }
