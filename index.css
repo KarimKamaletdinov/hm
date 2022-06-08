@@ -4,9 +4,23 @@ body{
     border-width: 0;
 }
 
+.panel {
+    position: absolute;
+}
+
 #event-year {
     font: italic 35px "Comic Sans MS";
+    color: white;
 }
 #event-name {
     font: italic 25px Consolas;
+    color: white;
+}
+#country-name {
+    z-index: 10;
+    position: absolute;
+    font: italic 25px Consolas;
+    cursor: default;
+    background-color: bisque;
+    border: black 2px solid;
 }

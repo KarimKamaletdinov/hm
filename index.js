@@ -1,13 +1,12 @@
-import {init, setUrl} from "./renderer.js";
+import {init, addModel, clearModels} from "./renderer.js";
 
-let i = 0;
 const response = await fetch('./data/events.json');
 const events = await response.json();
-init('./data/worlds/' + events[0].WorldId + '.3mf', () => {
+init('./data/worlds/' + events[0].WorldId + '/base.3mf', () => {
     document.querySelector('#event-year').textContent = yearToStr(events[0].Year);
     document.querySelector('#event-name').textContent = events[0].Name;
 });
-i++;
+
 loadNext().then();
 
 function sleep(ms) {
@@ -20,13 +19,23 @@ function yearToStr(year){
     return year + ' г. н.э.'
 }
 
+let i = 0;
 async function loadNext() {
     await sleep(10000);
     const event = events[i];
-    setUrl('./data/worlds/' + event.WorldId + '.3mf', () => {
-        document.querySelector('#event-year').textContent = yearToStr(event.Year);
-        document.querySelector('#event-name').textContent = event.Name;
-    });
+    const r = await fetch('./data/worlds/' + event.WorldId +'/countries.json');
+    const countries = await r.json();
+    let textPrinted = false;
+    clearModels();
+    countries.Countries.forEach(c => {
+        addModel('./data/worlds/' + event.WorldId + '/' + c + '.3mf', c, () => {
+            if(!textPrinted){
+                document.querySelector('#event-year').textContent = yearToStr(event.Year);
+                document.querySelector('#event-name').textContent = event.Name;
+                textPrinted = true;
+            }
+        });
+    })
     i+=1;
     if(i < events.length)
         await loadNext();
