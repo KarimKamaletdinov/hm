@@ -1,11 +1,35 @@
-import {init, addModel, clearModels} from "./renderer.js";
+import {start, loadCountries, set3D} from "./manager.js";
 
 const response = await fetch('./data/events.json');
 const events = await response.json();
-init('./data/worlds/' + events[0].WorldId + '/base.3mf', () => {
-    document.querySelector('#event-year').textContent = yearToStr(events[0].Year);
-    document.querySelector('#event-name').textContent = events[0].Name;
-});
+
+const eventYear = document.querySelector('#event-year');
+const eventName = document.querySelector('#event-name');
+const countryName = document.querySelector('#country-name');
+const switcher = document.querySelector('#switch');
+const simpleView = document.querySelector('#simple-view');
+const simpleViewCanvas = document.querySelector('#simple-view-canvas');
+
+let is3D = true;
+
+if(localStorage['is3D'] !== undefined){
+    is3D = localStorage['is3D'] === 'true';
+}
+
+const isMobile = navigator.userAgent.toLowerCase().match(/mobile/i);
+
+if(isMobile){
+    is3D = false;
+    if(document.body.requestFullscreen)
+        document.body.requestFullscreen().then();
+    screen.orientation.lock("landscape").then();
+}
+
+switcher.addEventListener('click', switchView);
+
+initGui().then();
+start(is3D, events[0], eventYear, eventName, countryName, simpleView, simpleViewCanvas).then();
+
 
 loadNext().then();
 
@@ -13,30 +37,35 @@ function sleep(ms) {
     return new Promise(r => setTimeout(r, ms));
 }
 
-function yearToStr(year){
-    if(year < 0)
-        return -year + ' г. до н.э.'
-    return year + ' г. н.э.'
-}
-
-let i = 0;
+let i = 1;
 async function loadNext() {
     await sleep(10000);
-    const event = events[i];
-    const r = await fetch('./data/worlds/' + event.WorldId +'/countries.json');
-    const countries = await r.json();
-    let textPrinted = false;
-    clearModels();
-    countries.Countries.forEach(c => {
-        addModel('./data/worlds/' + event.WorldId + '/' + c + '.3mf', c, () => {
-            if(!textPrinted){
-                document.querySelector('#event-year').textContent = yearToStr(event.Year);
-                document.querySelector('#event-name').textContent = event.Name;
-                textPrinted = true;
-            }
-        });
-    })
-    i+=1;
-    if(i < events.length)
+    await loadCountries(events[i]);
+    if(i + 1 < events.length){
+        i+=1;
         await loadNext();
+    }
+}
+
+async function initGui(){
+    if(is3D){
+        eventYear.className = 'event-year';
+        eventName.className = 'event-name';
+        countryName.className = 'country-name';
+        switcher.className = 'switch';
+        switcher.textContent = '2D';
+    } else {
+        eventYear.className = 'event-year-dark';
+        eventName.className = 'event-name-dark';
+        countryName.className = 'country-name-dark';
+        switcher.className = 'switch-dark';
+        switcher.textContent = '3D';
+    }
+}
+
+async function switchView(_) {
+    is3D = !is3D;
+    await initGui();
+    await set3D(is3D, events[i]);
+    localStorage['is3D'] = is3D;
 }

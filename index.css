@@ -1,26 +1,111 @@
-body{
+body, h1, h2, h3, h4, h5, h6, div{
     margin: 0;
     padding: 0;
     border-width: 0;
+    overflow: hidden;
 }
 
 .panel {
     position: absolute;
+    top: 10px;
+    left: 10px;
 }
 
-#event-year {
+.event-year {
     font: italic 35px "Comic Sans MS";
     color: white;
+    margin: 10px;
 }
-#event-name {
-    font: italic 25px Consolas;
+
+.event-name {
+    font: italic 25px "Comic Sans MS";
     color: white;
+    margin: 10px;
 }
-#country-name {
+
+.country-name {
     z-index: 10;
     position: absolute;
     font: italic 25px Consolas;
     cursor: default;
-    background-color: bisque;
+    margin: 5px;
+    color: black;
+    background-color: white;
     border: black 2px solid;
+}
+
+.event-year-dark {
+    font: italic 35px "Comic Sans MS";
+    color: black;
+    margin: 10px;
+}
+
+.event-name-dark {
+    font: italic 25px "Comic Sans MS";
+    color: black;
+    margin: 10px;
+}
+
+.country-name-dark {
+    z-index: 10;
+    position: absolute;
+    font: italic 25px Consolas;
+    cursor: default;
+    margin: 5px;
+    color: white;
+    background-color: black;
+    border: white 2px solid;
+}
+
+.simple-view {
+    width: 100vw;
+    height: 100vh;
+}
+
+.switch {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font: italic 25px "Comic Sans MS";
+    color: white;
+    background-color: black;
+    border: white 2px solid;
+    border-radius: 2px;
+    margin: 10px;
+}
+
+.switch:hover {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font: italic 25px "Comic Sans MS";
+    color: black;
+    background-color: white;
+    border: black 2px solid;
+    border-radius: 2px;
+    margin: 10px;
+}
+
+.switch-dark {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font: italic 25px "Comic Sans MS";
+    color: black;
+    background-color: white;
+    border: black 2px solid;
+    border-radius: 2px;
+    margin: 10px;
+}
+
+.switch-dark:hover {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font: italic 25px "Comic Sans MS";
+    color: white;
+    background-color: black;
+    border: white 2px solid;
+    border-radius: 2px;
+    margin: 10px;
 }
