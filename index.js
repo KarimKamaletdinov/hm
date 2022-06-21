@@ -20,14 +20,8 @@ const isMobile = navigator.userAgent.toLowerCase().match(/mobile/i);
 
 if(isMobile){
     is3D = false;
-    screen.orientation.lock("landscape")
-        .then(function() {
-        })
-        .catch(function(error) {
-            alert(error);
-        });
-    if(document.body.requestFullscreen)
-        document.body.requestFullscreen().then();
+    if(screen.orientation.type !== "landscape-primary" && screen.orientation.type !== "landscape-secondary")
+        alert("Поверните экран");
 }
 
 switcher.addEventListener('click', switchView);

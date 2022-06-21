@@ -63,7 +63,10 @@ export async function start(is3d, firstEvent, eventYearElement, eventNameElement
         if(!is3D)
             onMouseMove2D(e);
     })
-    simpleViewImg.addEventListener('load', () => context2d.drawImage(simpleViewImg, 0, 0, simpleViewCanvas.clientWidth, simpleViewCanvas.clientHeight));
+    simpleViewImg.addEventListener('load', () => {
+        context2d.clearRect(0, 0, simpleViewCanvas.clientWidth, simpleViewCanvas.clientHeight);
+        context2d.drawImage(simpleViewImg, 0, 0, simpleViewCanvas.clientWidth, simpleViewCanvas.clientHeight);
+    })
 
     await initGraphics(firstEvent);
 }
