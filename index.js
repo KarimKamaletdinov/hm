@@ -7,6 +7,7 @@ const eventYear = document.querySelector('#event-year');
 const eventName = document.querySelector('#event-name');
 const countryName = document.querySelector('#country-name');
 const switcher = document.querySelector('#switch');
+const aboutLink = document.querySelector('#about-link');
 const simpleView = document.querySelector('#simple-view');
 const simpleViewCanvas = document.querySelector('#simple-view-canvas');
 
@@ -51,12 +52,14 @@ async function initGui(){
     if(is3D){
         eventYear.className = 'event-year';
         eventName.className = 'event-name';
-        switcher.className = 'switch';
+        switcher.className = 'btn';
+        aboutLink.className = 'btn';
         switcher.textContent = '2D';
     } else {
         eventYear.className = 'event-year-dark';
         eventName.className = 'event-name-dark';
-        switcher.className = 'switch-dark';
+        switcher.className = 'btn-dark';
+        aboutLink.className = 'btn-dark';
         switcher.textContent = '3D';
     }
 }

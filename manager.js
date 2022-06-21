@@ -97,14 +97,16 @@ export async function set3D(is3d){
         if(is3D){
             simpleViewCanvas.setAttribute('hidden', '');
             if(threeElement === undefined){
-                init('./data/worlds/' + currentEvent.WorldId + '/base.3mf', () => {}, () => {});
+                init('./data/worlds/' + currentEvent.WorldId + '/base.3mf', () => {
+                    loadCountries(currentEvent);
+                }, onNothingHovered);
                 threeElement = getElement();
             }
         } else {
             simpleViewCanvas.removeAttribute('hidden');
             simpleViewCanvas.width = simpleViewCanvas.clientWidth;
             simpleViewCanvas.height = simpleViewCanvas.clientHeight;
+            await loadCountries(currentEvent);
         }
-        await loadCountries(currentEvent);
     }
 }
