@@ -22,6 +22,7 @@ if(isMobile){
     is3D = false;
     if(screen.orientation.type !== "landscape-primary" && screen.orientation.type !== "landscape-secondary")
         alert("Поверните экран");
+    switcher.setAttribute('hidden', '');
 }
 
 switcher.addEventListener('click', switchView);
