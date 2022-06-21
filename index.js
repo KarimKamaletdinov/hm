@@ -51,13 +51,11 @@ async function initGui(){
     if(is3D){
         eventYear.className = 'event-year';
         eventName.className = 'event-name';
-        countryName.className = 'country-name';
         switcher.className = 'switch';
         switcher.textContent = '2D';
     } else {
         eventYear.className = 'event-year-dark';
         eventName.className = 'event-name-dark';
-        countryName.className = 'country-name-dark';
         switcher.className = 'switch-dark';
         switcher.textContent = '3D';
     }

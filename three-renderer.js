@@ -99,18 +99,20 @@ export function addModel(modelUrl, onLoad, onHover){
     loadModel(modelUrl, object => {
         models.push({
             id: object.children[0].children[0].uuid,
-            hover: onHover
+            hover: onHover,
+            url: modelUrl
         });
         onLoad();
         render();
     })
 }
 
-export function clearModels(){
-    models = [];
-    for (let i = 3; i < scene.length; i++){
-        scene.remove(i);
-    }
+export function removeModel(modelUrl){
+    scene.remove(models.find(x => x.url === modelUrl).id);
+}
+
+export function hasModel(modelUrl){
+    return models.some(x => x.url === modelUrl);
 }
 
 export function getElement(){
