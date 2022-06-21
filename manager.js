@@ -5,14 +5,16 @@ let is3D, eventYear, eventName, countryName, threeElement, simpleViewImg, simple
 async function initGraphics(firstEvent) {
     if(is3D){
         simpleViewCanvas.setAttribute('hidden', '');
-        init('./data/worlds/' + firstEvent.WorldId + '/base.3mf', () => {}, onNothingHovered);
+        init('./data/worlds/' + firstEvent.WorldId + '/base.3mf', () => {
+            loadCountries(firstEvent);
+        }, onNothingHovered);
         threeElement = getElement();
     } else {
         simpleViewCanvas.removeAttribute('hidden');
         simpleViewCanvas.width = simpleViewCanvas.clientWidth;
         simpleViewCanvas.height = simpleViewCanvas.clientHeight;
+        await loadCountries(firstEvent);
     }
-    await loadCountries(firstEvent);
 }
 
 function yearToStr(year){

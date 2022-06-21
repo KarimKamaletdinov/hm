@@ -20,9 +20,14 @@ const isMobile = navigator.userAgent.toLowerCase().match(/mobile/i);
 
 if(isMobile){
     is3D = false;
+    screen.orientation.lock("landscape")
+        .then(function() {
+        })
+        .catch(function(error) {
+            alert(error);
+        });
     if(document.body.requestFullscreen)
         document.body.requestFullscreen().then();
-    screen.orientation.lock("landscape").then();
 }
 
 switcher.addEventListener('click', switchView);
