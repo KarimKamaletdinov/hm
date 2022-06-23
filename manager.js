@@ -2,25 +2,22 @@ import {init, addModel, removeModel, getElement, hasModel} from "./three-rendere
 
 let is3D, eventYear, eventName, countryName, threeElement, simpleViewImg, simpleViewCanvas, context2d, currentEvent;
 
-async function initGraphics(firstEvent) {
-    if(is3D){
-        simpleViewCanvas.setAttribute('hidden', '');
-        init('./data/worlds/' + firstEvent.WorldId + '/base.3mf', () => {
-            loadCountries(firstEvent);
-        }, onNothingHovered);
-        threeElement = getElement();
-    } else {
-        simpleViewCanvas.removeAttribute('hidden');
-        simpleViewCanvas.width = simpleViewCanvas.clientWidth;
-        simpleViewCanvas.height = simpleViewCanvas.clientHeight;
-        await loadCountries(firstEvent);
-    }
-}
-
-function yearToStr(year){
-    if(year < 0)
-        return -year + ' г. до н.э.'
-    return year + ' г. н.э.'
+function initGraphics(firstEvent) {
+    return new Promise((resolve) => {
+        if(is3D){
+            simpleViewCanvas.setAttribute('hidden', '');
+            let finished = false;
+            init('./data/worlds/' + firstEvent.WorldId + '/base.3mf', () => {
+                resolve();
+            }, onNothingHovered);
+            threeElement = getElement();
+        } else {
+            simpleViewCanvas.removeAttribute('hidden');
+            simpleViewCanvas.width = simpleViewCanvas.clientWidth;
+            simpleViewCanvas.height = simpleViewCanvas.clientHeight;
+            resolve();
+        }
+    });
 }
 
 function onHover(country, event) {
@@ -75,20 +72,29 @@ export async function start(is3d, firstEvent, eventYearElement, eventNameElement
     await initGraphics(firstEvent);
 }
 
-export async function loadCountries(event){
-    currentEvent = event;
-    eventYear.textContent = yearToStr(event.Year);
-    eventName.textContent = event.Name;
-    if(is3D){
-        event.ChangedCountriesNames.forEach(country => {
-            const modelUrl = './data/worlds/' + event.WorldId + '/' + country + '.3mf';
-            if(hasModel(modelUrl))
-                removeModel(modelUrl);
-            addModel(modelUrl, () => { }, e => { onHover(country, e)});
-        });
-    } else {
-        simpleViewImg.src = './data/worlds/' + event.WorldId + '.bmp';
-    }
+export function loadCountries(event){
+    return new Promise(r => {
+        currentEvent = event;
+        if(is3D){
+            if(event.ChangedCountriesNames.length === 0)
+                r();
+            event.ChangedCountriesNames.forEach(country => {
+                const modelUrl = './data/worlds/' + event.WorldId + '/' + country + '.3mf';
+                if(hasModel(modelUrl))
+                    removeModel(modelUrl);
+                fetch(modelUrl).then(response =>{
+                        if(response.ok)
+                            addModel(modelUrl, () => { r();}, e => { onHover(country, e)});
+                        else
+                            r();
+                }).catch(() => r());
+
+            });
+        } else {
+            simpleViewImg.src = './data/worlds/' + event.WorldId + '.bmp';
+            r();
+        }
+    });
 }
 
 export async function set3D(is3d){
