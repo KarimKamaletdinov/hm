@@ -25,8 +25,8 @@ function onMouseMove(event) {
     if (intersects.length > 0) {
         intersects.forEach(intersect => {
             selection = intersect.object
-            if(models.some(x => x.id === selection.uuid)){
-                let model = models.find(x => x.id === selection.uuid);
+            if(models.some(x => x.id === selection.id)){
+                let model = models.find(x => x.id === selection.id);
                 model.hover(event);
             }
             else {
@@ -39,7 +39,7 @@ function onMouseMove(event) {
     }
 }
 
-function render() {
+export function render() {
     renderer.render( scene, camera );
 }
 
@@ -95,24 +95,56 @@ export function init(modelUrl, onLoad, onNothingHovered) {
 
 }
 
-export function addModel(modelUrl, onLoad, onHover){
-    loadModel(modelUrl, object => {
-        models.push({
-            id: object.children[0].children[0].uuid,
-            hover: onHover,
-            url: modelUrl
+export function addModel(modelUrl, name, onHover){
+    return new Promise(r => {
+        loadModel(modelUrl, object => {
+            models.push({
+                id: object.children[0].children[0].id,
+                parentId: object.id,
+                name: name,
+                hover: onHover,
+                url: modelUrl
+            });
+            r();
+        })
+    });
+}
+
+export function removeModel(name){
+    const model = models.find(x => x.name === name);
+    const object = scene.getObjectById(model.parentId);
+    scene.remove(object);
+    let newModels = [];
+    models.forEach(m => {
+        if(m.name != name){
+            newModels.push(m);
+        }
+    });
+    models = newModels;
+}
+
+export function updateModel(name, modelUrl){
+    return new Promise(r => {
+        const model = models.find(x => x.name === name);
+        const previousObject = scene.getObjectById(model.parentId);
+        loadModel(modelUrl, object => {
+            model.id = object.children[0].children[0].id;
+            model.parentId = object.id;
+            scene.remove(previousObject);
+            r();
         });
-        onLoad();
-        render();
-    })
+    });
 }
 
-export function removeModel(modelUrl){
-    scene.remove(models.find(x => x.url === modelUrl).id);
+export function clearModels(){
+    models = [];
+    for (let i = 3; i < scene.length; i++){
+        scene.remove(i);
+    }
 }
 
-export function hasModel(modelUrl){
-    return models.some(x => x.url === modelUrl);
+export function hasModel(name){
+    return models.some(x => x.name === name);
 }
 
 export function getElement(){

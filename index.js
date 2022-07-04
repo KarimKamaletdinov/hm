@@ -1,17 +1,21 @@
 import {start, loadCountries, set3D} from "./manager.js";
+import { init, addEvent, removeEvent } from "./event-list.js";
 
 const response = await fetch('./data/events.json');
 const events = await response.json();
 
 const eventYear = document.querySelector('#event-year');
 const ourAge = document.querySelector('#our-age');
-const beforeOurAge= document.querySelector('#before-our-age');
+const beforeOurAge = document.querySelector('#before-our-age');
 const eventName = document.querySelector('#event-name');
+const eventPanel = document.querySelector('#event-panel');
 const countryName = document.querySelector('#country-name');
 const switcher = document.querySelector('#switch');
 const aboutLink = document.querySelector('#about-link');
 const simpleView = document.querySelector('#simple-view');
 const simpleViewCanvas = document.querySelector('#simple-view-canvas');
+const bottomInfo = document.querySelector('#bottom-info');
+const closeBottomInfo = document.querySelector('#bottom-info-close');
 
 let is3D = true;
 
@@ -19,22 +23,26 @@ if(localStorage['is3D'] !== undefined){
     is3D = localStorage['is3D'] === 'true';
 }
 
-const isMobile = navigator.userAgent.toLowerCase().match(/mobile/i);
-
-if(isMobile){
-    is3D = false;
-    if(screen.orientation.type !== "landscape-primary" && screen.orientation.type !== "landscape-secondary")
-        alert("Поверните экран");
-    switcher.setAttribute('hidden', '');
-}
-
 switcher.addEventListener('click', switchView);
 
-initGui().then();
-let id = 1;
+if(localStorage['infoClosed'] === 'true'){
+    bottomInfo.remove();
+} else {
+    closeBottomInfo.addEventListener('click', _ => {
+        localStorage['infoClosed'] = true;
+        bottomInfo.remove();
+    });
+}
 
-start(is3D, events[0], eventYear, eventName, countryName, simpleView, simpleViewCanvas).then(() => {
-    let year = events[0].Year;
+initGui().then();
+
+let continuousEvents = [];
+
+const startNum = 0;
+let id = startNum + 1;
+
+start(is3D, events[startNum], eventYear, eventName, countryName, simpleView, simpleViewCanvas).then(() => {
+    let year = events[startNum].Year;
     eventYear.textContent = year < 0 ? -year : year;
     if(year < 0){
         beforeOurAge.removeAttribute('hidden');
@@ -43,10 +51,11 @@ start(is3D, events[0], eventYear, eventName, countryName, simpleView, simpleView
         ourAge.removeAttribute('hidden');
         beforeOurAge.setAttribute('hidden', '');
     }
-    load(0).then(() => {
+    init(eventPanel, eventName);
+    load(startNum).then(() => {
         if(events.length > 1){
-            let next = events[1].Year;
-            let interval = setInterval(nextYear, 7);
+            let next = events[startNum + 1].Year;
+            let interval = setInterval(nextYear, 5);
 
             function nextYear() {
                 if (year < next) {
@@ -56,6 +65,10 @@ start(is3D, events[0], eventYear, eventName, countryName, simpleView, simpleView
                         beforeOurAge.setAttribute('hidden', '');
                     }
                     eventYear.textContent = year < 0 ? -year : year;
+                    if(continuousEvents.some(x => x.EndYear == year)){
+                        continuousEvents.filter(x => x.EndYear == year).forEach(ce => removeEvent(ce.Name));
+                        continuousEvents = continuousEvents.filter(x => x.EndYear != year);
+                    }
                 } else {
                     clearInterval(interval);
                     load(id).then(() => {
@@ -78,12 +91,15 @@ function sleep(ms) {
 }
 
 async function load(id) {
-    eventName.textContent = '';
     const event = events[id];
-    eventName.textContent = event.Name;
+    addEvent(event.Name);
     await loadCountries(event);
     await sleep(2000);
-    eventName.textContent = '';
+    if (event.EndYear == null){
+        removeEvent(event.Name);
+    } else {
+        continuousEvents.push(event);
+    }
 }
 
 async function initGui(){

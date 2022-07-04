@@ -10,13 +10,13 @@
 
 </canvas>
 <img id="simple-view" class="simple-view" alt="2D view" hidden>
-<div class="panel">
+<div class="event-panel" id="event-panel">
     <h1 class="event-year">
         <a id="event-year">Загрузка...</a>
         <a id="our-age" hidden>год н. э.</a>
         <a id="before-our-age" hidden>год до н. э.</a>
     </h1>
-    <h1 id="event-name" class="event-name"></h1>
+    <h1 class="event-name" id="event-name"></h1>
 </div>
 <div id="country-name" class="country-name"></div>
 <div class="btn-container">
@@ -24,6 +24,12 @@
     <form action="./about.html" method="get" target="_blank">
         <button type="submit" class="btn" id="about-link">О проекте</button>
     </form>
+</div>
+<div id="bottom-info" class="bottom-info">
+    <span class="bottom-info-text">
+        ВСЕ ГРАНИЦЫ ГОСУДАРСТВ И ДАТЫ НЕ ЯВЛЯЮТСЯ ТОЧНЫМИ, А СЛУЖАТ ДЛЯ ПРИМЕРНОГО ПРЕДСТАВЛЕНИЯ О ХОДЕ ИСТОРИЧЕСКИХ СОБЫТИЙ
+    </span>
+    <button id="bottom-info-close" class="bottom-info-close">OK</button>
 </div>
 <script type="module" src="index.js"></script>
 </body>

@@ -1,4 +1,4 @@
-import {init, addModel, removeModel, getElement, hasModel} from "./three-renderer.js";
+import {init, addModel, updateModel, removeModel, getElement, hasModel, clearModels, render} from "./three-renderer.js";
 
 let is3D, eventYear, eventName, countryName, threeElement, simpleViewImg, simpleViewCanvas, context2d, currentEvent;
 
@@ -6,7 +6,6 @@ function initGraphics(firstEvent) {
     return new Promise((resolve) => {
         if(is3D){
             simpleViewCanvas.setAttribute('hidden', '');
-            let finished = false;
             init('./data/worlds/' + firstEvent.WorldId + '/base.3mf', () => {
                 resolve();
             }, onNothingHovered);
@@ -72,24 +71,55 @@ export async function start(is3d, firstEvent, eventYearElement, eventNameElement
     await initGraphics(firstEvent);
 }
 
-export function loadCountries(event){
+export async function loadCountries(event){
+    currentEvent = event;
+    if(is3D){
+        if(event.ChangedCountriesNames.length === 0)
+            return;
+        const response = await fetch('./data/worlds/' + event.WorldId + '.json');
+        const countries = await response.json();
+        let add = [];
+        let update = [];
+        let remove = [];
+        event.ChangedCountriesNames.forEach(async (country) => {
+            if(countries.some(c => c.Name == country)){
+                if(hasModel(country)){
+                    update.push(country);
+                } else {
+                    add.push(country);
+                }
+            } else if (hasModel(country)){
+                remove.push(country);
+            }
+        });
+        add.forEach(async (country) =>{
+            await addModel('./data/worlds/' + event.WorldId + '/' + country + '.3mf', country, e => onHover(country, e));
+        });
+        update.forEach(async (country) =>{
+            await updateModel(country, './data/worlds/' + event.WorldId + '/' + country + '.3mf');
+        });
+        remove.forEach((country) =>{
+            removeModel(country);
+        });
+    } else {
+        simpleViewImg.src = './data/worlds/' + event.WorldId + '.bmp';
+    }
+}
+
+
+function loadAllCountries(event){
     return new Promise(r => {
         currentEvent = event;
         if(is3D){
-            if(event.ChangedCountriesNames.length === 0)
-                r();
-            event.ChangedCountriesNames.forEach(country => {
-                const modelUrl = './data/worlds/' + event.WorldId + '/' + country + '.3mf';
-                if(hasModel(modelUrl))
-                    removeModel(modelUrl);
-                fetch(modelUrl).then(response =>{
-                        if(response.ok)
-                            addModel(modelUrl, () => { r();}, e => { onHover(country, e)});
-                        else
-                            r();
-                }).catch(() => r());
-
-            });
+            fetch('./data/worlds/' + event.WorldId + '.json').then(response => response.json().then(countries => {
+                clearModels();
+                countries.forEach(country => {
+                    if(country.Name != 'water'){
+                        addModel('./data/worlds/' + event.WorldId + '/' + country.Name + '.3mf', country.Name,
+                        r, e => { onHover(country.Name, e)});
+                    }
+                });
+            }));
         } else {
             simpleViewImg.src = './data/worlds/' + event.WorldId + '.bmp';
             r();
@@ -104,15 +134,17 @@ export async function set3D(is3d){
             simpleViewCanvas.setAttribute('hidden', '');
             if(threeElement === undefined){
                 init('./data/worlds/' + currentEvent.WorldId + '/base.3mf', () => {
-                    loadCountries(currentEvent);
+                    loadAllCountries(currentEvent);
                 }, onNothingHovered);
                 threeElement = getElement();
+            } else {
+                loadAllCountries(currentEvent);
             }
         } else {
             simpleViewCanvas.removeAttribute('hidden');
             simpleViewCanvas.width = simpleViewCanvas.clientWidth;
             simpleViewCanvas.height = simpleViewCanvas.clientHeight;
-            await loadCountries(currentEvent);
+            await loadAllCountries(currentEvent);
         }
     }
 }
