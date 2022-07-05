@@ -23,6 +23,15 @@ if(localStorage['is3D'] !== undefined){
     is3D = localStorage['is3D'] === 'true';
 }
 
+const isMobile = navigator.userAgent.toLowerCase().match(/mobile/i);
+
+if(isMobile){
+    is3D = false;
+    if(screen.orientation.type !== "landscape-primary" && screen.orientation.type !== "landscape-secondary")
+        alert("Поверните экран");
+    switcher.setAttribute('hidden', '');
+}
+
 switcher.addEventListener('click', switchView);
 
 if(localStorage['infoClosed'] === 'true'){
@@ -66,7 +75,7 @@ start(is3D, events[startNum], eventYear, eventName, countryName, simpleView, sim
                     }
                     eventYear.textContent = year < 0 ? -year : year;
                     if(continuousEvents.some(x => x.EndYear == year)){
-                        continuousEvents.filter(x => x.EndYear == year).forEach(ce => removeEvent(ce.Name));
+                        continuousEvents.filter(x => x.EndYear == year).forEach(ce => removeEvent(stringifyContinuousEvent(ce)));
                         continuousEvents = continuousEvents.filter(x => x.EndYear != year);
                     }
                 } else {
@@ -90,9 +99,25 @@ function sleep(ms) {
     return new Promise(r => setTimeout(r, ms));
 }
 
+function stringifyYear(year){
+    if(year < 0){
+        return (-year).toString() + ' до н.э.'
+    } else {
+        return year.toString();
+    }
+}
+
+function stringifyContinuousEvent(ce){
+    return `${ce.Name} (${stringifyYear(ce.Year)} - ${stringifyYear(ce.EndYear)})`;
+}
+
 async function load(id) {
     const event = events[id];
-    addEvent(event.Name);
+    if(event.EndYear == null){
+        addEvent(event.Name);
+    } else {
+        addEvent(stringifyContinuousEvent(event));
+    }
     await loadCountries(event);
     await sleep(2000);
     if (event.EndYear == null){
