@@ -110,7 +110,7 @@ export function addModel(modelUrl, name, onHover){
     });
 }
 
-export function removeModel(name){
+export async function removeModel(name){
     const model = models.find(x => x.name === name);
     const object = scene.getObjectById(model.parentId);
     scene.remove(object);
@@ -136,7 +136,7 @@ export function updateModel(name, modelUrl){
     });
 }
 
-export function clearModels(){
+export async function clearModels(){
     models = [];
     for (let i = 3; i < scene.length; i++){
         scene.remove(i);

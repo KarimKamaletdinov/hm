@@ -2,14 +2,14 @@ import {init, addModel, updateModel, removeModel, getElement, hasModel, clearMod
 
 let is3D, eventYear, eventName, countryName, threeElement, simpleViewImg, simpleViewCanvas, context2d, currentEvent;
 
-function initGraphics(firstEvent) {
+async function initGraphics(firstEvent) {
     return new Promise((resolve) => {
         if(is3D){
             simpleViewCanvas.setAttribute('hidden', '');
             init('./data/worlds/' + firstEvent.WorldId + '/base.3mf', () => {
+                threeElement = getElement();
                 resolve();
             }, onNothingHovered);
-            threeElement = getElement();
         } else {
             simpleViewCanvas.removeAttribute('hidden');
             simpleViewCanvas.width = simpleViewCanvas.clientWidth;
@@ -98,8 +98,8 @@ export async function loadCountries(event){
         update.forEach(async (country) =>{
             await updateModel(country, './data/worlds/' + event.WorldId + '/' + country + '.3mf');
         });
-        remove.forEach((country) =>{
-            removeModel(country);
+        remove.forEach(async (country) => {
+            await removeModel(country);
         });
     } else {
         simpleViewImg.src = './data/worlds/' + event.WorldId + '.bmp';
@@ -107,24 +107,21 @@ export async function loadCountries(event){
 }
 
 
-function loadAllCountries(event){
-    return new Promise(r => {
-        currentEvent = event;
-        if(is3D){
-            fetch('./data/worlds/' + event.WorldId + '.json').then(response => response.json().then(countries => {
-                clearModels();
-                countries.forEach(country => {
-                    if(country.Name != 'water'){
-                        addModel('./data/worlds/' + event.WorldId + '/' + country.Name + '.3mf', country.Name,
-                        r, e => { onHover(country.Name, e)});
-                    }
-                });
-            }));
-        } else {
-            simpleViewImg.src = './data/worlds/' + event.WorldId + '.bmp';
-            r();
-        }
-    });
+async function loadAllCountries(event){
+    currentEvent = event;
+    if(is3D){
+        const response = await fetch('./data/worlds/' + event.WorldId + '.json')
+        const countries = await response.json()
+        await clearModels();
+        countries.forEach(async (country) => {
+            if(country.Name != 'water'){
+                await addModel('./data/worlds/' + event.WorldId + '/' + country.Name + '.3mf',
+                    country.Name, e => onHover(country.Name, e));
+            }
+        });
+    } else {
+        simpleViewImg.src = './data/worlds/' + event.WorldId + '.bmp';
+    }
 }
 
 export async function set3D(is3d){
