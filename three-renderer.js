@@ -137,10 +137,8 @@ export function updateModel(name, modelUrl){
 }
 
 export async function clearModels(){
+    models.forEach(async (m) => removeModel(m.name));
     models = [];
-    for (let i = 3; i < scene.length; i++){
-        scene.remove(i);
-    }
 }
 
 export function hasModel(name){

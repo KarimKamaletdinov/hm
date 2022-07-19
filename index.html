@@ -21,6 +21,9 @@
 <div id="country-name" class="country-name"></div>
 <div class="btn-container">
     <button id="switch" class="btn">2D</button>
+    <button id="show-input-year-dialog" class="btn">Год</button>
+    <button id="pause" class="btn">►</button>
+    <button id="show-speed-dialog" class="btn">Скорость</button>
     <form action="./about.html" method="get" target="_blank">
         <button type="submit" class="btn" id="about-link">О проекте</button>
     </form>
@@ -31,6 +34,24 @@
     </span>
     <button id="bottom-info-close" class="bottom-info-close">OK</button>
 </div>
+<div class="dialog" id="input-year-dialog" hidden>
+    <h1 class="dialog-header">Выберите год</h1>
+    <input type="number" class="dialog-input" id="input-year">
+    <button class="btn-dark dialog-ok" id="input-year-dialog-ok">OK</button>
+    <button class="btn-dark dialog-cancel" id="input-year-dialog-cancel">Отмена</button>
+</div>
+
+<div class="dialog small-dialog" id="speed-dialog" hidden>
+    <h1 class="dialog-header">Скорость</h1>
+    <div style="width:100%">
+        <div class="dialog-minus"><button class="btn-dark " id="speed-dialog-minus">-</button></div>
+        <div class="dialog-plus"><button class="btn-dark " id="speed-dialog-plus">+</button></div>
+        <div class="dialog-value" id="speed-dialog-value">0</div>
+    </div>
+    <button class="btn-dark dialog-ok" id="speed-dialog-ok">OK</button>
+    <button class="btn-dark dialog-cancel" id="speed-dialog-cancel">Отмена</button>
+</div>
+
 <script type="module" src="index.js"></script>
 </body>
 </html>

@@ -20,12 +20,13 @@ async function initGraphics(firstEvent) {
 }
 
 function onHover(country, event) {
-    if(countryName.hasAttribute('hidden')){
-        countryName.removeAttribute('hidden');
-    }
     countryName.style.left = (event.clientX - 50) + 'px';
     countryName.style.top = (event.clientY + 10) + 'px';
     countryName.textContent = country;
+
+    if(countryName.hasAttribute('hidden')){
+        countryName.removeAttribute('hidden');
+    }
 }
 
 function onNothingHovered() {
@@ -143,5 +144,13 @@ export async function set3D(is3d){
             simpleViewCanvas.height = simpleViewCanvas.clientHeight;
             await loadAllCountries(currentEvent);
         }
+    }
+}
+
+export async function jumpTo(event){
+    if(event === undefined){
+        await clearModels();
+    } else {
+        await loadAllCountries(event);
     }
 }
